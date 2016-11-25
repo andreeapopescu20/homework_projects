@@ -24,33 +24,13 @@ public class PeoplePage {
     @FindBy(xpath = "//ul[@class = 'action-links']/li/a")
     private WebElement addUserButton;
 
-
     public CreateUserPage addUser() {
         addUserButton.click();
         driver.switchTo().defaultContent();
-
         WebElement frame = driver.findElement(By.xpath("//iframe[@class='overlay-element']"));
         driver.switchTo().frame(frame);
-
         CreateUserPage createUser = PageFactory.initElements(driver, CreateUserPage.class);
         return createUser;
-    }
-
-    @FindBy(xpath = "//table[contains(@class,'sticky-enabled')]/tbody/tr")
-    private List<WebElement> table;
-
-
-    public void checkUserCreated(){
-
-       // List<WebElement> usersList = table.findElements(By.xpath("/tr"));
-    for(WebElement user : table){
-        String name = user.findElement(By.xpath("//a[@class='username']")).getText();
-        System.out.println(name);
-        if(name.equals("andreea")){
-            System.out.println("User" + "andreea" + "exists!");
-            break;
-        }
-    }
     }
 }
 

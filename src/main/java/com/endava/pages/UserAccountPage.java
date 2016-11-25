@@ -1,9 +1,11 @@
 package com.endava.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 /**
  * Created by andpopescu on 11/24/2016.
@@ -24,26 +26,46 @@ public class UserAccountPage {
     @FindBy(id = "edit-mail")
     private WebElement emailField;
 
-    @FindBy(id="edit-roles-3")
-    private WebElement role;
+    @FindBy(xpath = "//a[contains(.,'Log out')]")
+    private WebElement logOutButton;
+
 
     public void checkUserInfo(String username, String email){
         editDetailsButton.click();
 
-        if(driver.getCurrentUrl().equals("http://192.168.100.125/drupal-7.15/?q=user#overlay=%3Fq%3Duser%252F3%252Fedit")){
-            WebElement frame = driver.findElement(By.xpath("//iframe[contains(@class,'overlay-active')]"));
+        if(driver.getCurrentUrl().contains("overlay")){
+            driver.switchTo().defaultContent();
+            WebElement frame = driver.findElement(By.xpath("//div[@id='overlay-container']/iframe[contains(@class,'overlay-active')]"));
             driver.switchTo().frame(frame);
         }
-        String name = userName.getText();
-        //System.out.println(name);
-        String mail = emailField.getAttribute("value");
-        //System.out.println(mail);
 
-        if((!role.isDisplayed())&&(name.equals(username))&&(mail.equals(email))){
-            System.out.println("The info is correct for this user");
+        String name = userName.getText();
+        String mail = emailField.getAttribute("value");
+
+        boolean rolePresent;
+        try {
+            driver.findElement(By.id("edit-roles-3"));
+            rolePresent = true;
+        } catch (NoSuchElementException e) {
+            rolePresent = false;
         }
 
+        if(rolePresent == true) {
+            System.out.println("User " + name + " is administrator!");
+        }
+        else{
+            System.out.println("User " + name + " is not administrator!");
+        }
 
+        if(name.equals(username)&& mail.equals(email)){
+            System.out.println("The info for this user is correct!");
+        }
     }
 
+    public LogInPage logOut(){
+        driver.switchTo().defaultContent();
+        logOutButton.click();
+        LogInPage logInPage = PageFactory.initElements(driver, LogInPage.class);
+        return logInPage;
+    }
 }

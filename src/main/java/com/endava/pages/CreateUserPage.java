@@ -41,6 +41,9 @@ public class CreateUserPage {
     @FindBy(xpath = "//div[@class='breadcrumb']/a[@title='Manage user accounts, roles, and permissions.']")
     private WebElement peoplePageButton;
 
+    @FindBy(xpath = "//*[@id='toolbar-user']//a[contains(.,'Log out')]")
+    private WebElement logOutButton;
+
     public void createNewUser(String username, String email, String password, Boolean isAdmin) {
         usernameField.sendKeys(username);
         emailField.sendKeys(email);
@@ -52,28 +55,11 @@ public class CreateUserPage {
         createButton.submit();
     }
 
-    /*
-    public PeoplePage goBackToPeoplePage(){
-        peoplePageButton.click();
-
-        driver.switchTo().defaultContent();
-        WebElement frame = driver.findElement(By.xpath("//iframe[@class='overlay-element']"));
-        driver.switchTo().frame(frame);
-
-        PeoplePage peoplePage = PageFactory.initElements(driver, PeoplePage.class);
-        return peoplePage;
-    }
-    */
-
-    @FindBy(xpath = "//*[@id='toolbar-user']//a[contains(.,'Log out')]")
-    private WebElement logOutButton;
-
     public LogInPage logOut(){
         driver.switchTo().defaultContent();
         logOutButton.click();
         LogInPage logInPage = PageFactory.initElements(driver, LogInPage.class);
         return logInPage;
-
     }
 }
 

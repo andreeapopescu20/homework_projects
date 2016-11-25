@@ -17,12 +17,15 @@ public class DrupalTest {
     private WebDriver driver;
     private LogInPage logInPage;
 
-    private String adminUsername = "admin";
-    private String email = "fthhghg.Hahue@endava.com";
+    private String adminUserName = "admin";
 
-    private String firstUserName = "ovi8";
-    private String firstUserPassword = "ovi8";
-    private String firstUserEmail = "ovi8@ceva.com";
+    private String firstUserName = "NormalUser";
+    private String firstUserPassword = "pass";
+    private String firstUserEmail = "normaluser@test.com";
+
+    private String secondUserName = "AdminUser";
+    private String secondUserPassword = "pass";
+    private String secondUserEmail = "adminuser@test.com";
 
     @Before
     public void before(){
@@ -33,26 +36,40 @@ public class DrupalTest {
 
     @After
     public void after(){
-        //driver.close();
+        driver.close();
     }
+
     @Test
     public void test(){
-    HomePage homePage = logInPage.logIn(adminUsername,"admin_pass");
-    homePage.checkLogIn("Hello " + adminUsername);
-    PeoplePage peoplePage = homePage.manageUsers();
-    CreateUserPage createUser = peoplePage.addUser();
+        //login on site with an admin user
+        HomePage homePage = logInPage.logIn(adminUserName,"admin_pass");
+        //check if the login was successful
+        homePage.checkLogIn("Hello " + adminUserName);
 
-    createUser.createNewUser(firstUserName, firstUserEmail,firstUserPassword, false);
-    logInPage = createUser.logOut();
-    homePage = logInPage.logIn(firstUserName,firstUserPassword);
-    UserAccountPage userAccountPage = homePage.goToAccount();
-    userAccountPage.checkUserInfo(firstUserName,firstUserEmail);
+        //create 2 users from People Management page
+        PeoplePage peoplePage = homePage.manageUsers();
+        CreateUserPage createUser = peoplePage.addUser();
+        //user without admin privileges
+        createUser.createNewUser(firstUserName, firstUserEmail,firstUserPassword, false);
+        //user with admin privileges
+        createUser.createNewUser(secondUserName, secondUserEmail,secondUserPassword, true);
 
+        //logout and login with the first user created
+        logInPage = createUser.logOut();
+        homePage = logInPage.logIn(firstUserName,firstUserPassword);
+        UserAccountPage userAccountPage = homePage.goToAccount();
+        //check first user info
+        userAccountPage.checkUserInfo(firstUserName,firstUserEmail);
+        logInPage = userAccountPage.logOut();
+        //check in database if the user exists
+        DatabaseConnection dbConn = new DatabaseConnection();
+        dbConn.checkDataSet(firstUserName,firstUserEmail);
 
-    //createUser.createNewUser("andreeaAdmin", "cde@ceva.com","test123",true);
-
-
-    //DatabaseConnection dbConn = new DatabaseConnection();
-    //dbConn.checkDataSet(username,email);
+        //login with the second user and follow the same procedure
+        homePage = logInPage.logIn(secondUserName,secondUserPassword);
+        userAccountPage = homePage.goToAccount();
+        userAccountPage.checkUserInfo(secondUserName,secondUserEmail);
+        userAccountPage.logOut();
+        dbConn.checkDataSet(secondUserName,secondUserEmail);
     }
 }

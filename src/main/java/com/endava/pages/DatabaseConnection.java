@@ -7,7 +7,7 @@ import java.sql.*;
  */
 public class DatabaseConnection {
 
-    static final String DB_URL = "jdbc:mysql://192.168.100.125:3306/drupal";
+    static final String URL = "jdbc:mysql://192.168.100.125:3306/drupal";
     static final String USER = "root";
     static final String PASS = "root";
 
@@ -17,7 +17,7 @@ public class DatabaseConnection {
         try{
 
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DB_URL,USER,PASS);
+            conn = DriverManager.getConnection(URL,USER,PASS);
             stmt = conn.createStatement();
             String sql;
             sql = "SELECT * FROM users WHERE name = '"+username+"'"+"and mail = '"+email+"'";
@@ -29,9 +29,12 @@ public class DatabaseConnection {
                 System.out.println("Record does not exists in db");
             }
 
+            System.out.println("-----------------------------------");
+
             rs.close();
             stmt.close();
             conn.close();
+
         }catch(SQLException se){
             se.printStackTrace();
         }catch(Exception e){
